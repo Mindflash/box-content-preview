@@ -756,8 +756,13 @@ class Preview extends EventEmitter {
     loadFromServer() {
         const { apiHost, queryParams } = this.options;
 
-        const fileInfoUrl = appendQueryParams(getURL(this.file.id, apiHost), queryParams);
-        get(fileInfoUrl, this.getRequestHeaders())
+        let fileInfoUrl = appendQueryParams(getURL(this.file.id, apiHost), queryParams);
+        const headers = this.getRequestHeaders();
+        delete headers.Authorization;
+        fileInfoUrl = `/gaviota-api/box/?bu=${encodeURIComponent(fileInfoUrl)}
+                        &bh=${encodeURIComponent(JSON.stringify(headers))}`;
+
+        get(fileInfoUrl)
             .then(this.handleFileInfoResponse)
             .catch(this.handleFetchError);
     }
